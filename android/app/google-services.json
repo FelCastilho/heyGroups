@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "328374472078",
+    "project_id": "heygroup-4fe02",
+    "storage_bucket": "heygroup-4fe02.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328374472078:android:a956221bc6e4bfc2a4a8df",
+        "android_client_info": {
+          "package_name": "com.heygroup"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsimGfIbhSkRax-BTlLjaO1iyF4gcUO2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
