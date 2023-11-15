@@ -1,14 +1,65 @@
 import React, {useState} from 'react';
 import { SafeAreaView, Text, TouchableOpacity, TextInput, StyleSheet, Platform } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
+
+import auth from '@react-native-firebase/auth';
+
 export default function SignIn() {
 
+  const navigation = useNavigation();
   const [ name, setName ] = useState('');
   const [ email, setEmail ] = useState('');
   const [ password, setPassword ] = useState('');
 
   //Controlar login true ou false;
+  //True = Cadastrar || false = Logar
   const [ type, setType ] = useState(false);
+
+  function handleLogin(){
+
+    if(type){
+      //Cadastrar User
+
+      if(name === '' || password === '' || email === '') return;
+
+      auth().createUserWithEmailAndPassword(email, password)
+      .then( (user) => {
+
+        user.user.updateProfile({
+          displayName: name,
+        })
+        .then(() => {
+          navigation.goBack();
+        })
+      })
+      .catch((error) => {
+        if (error.code === 'auth/email-already-in-use') {
+          console.log('Essa email já está sendo usado!');
+        }
+    
+        if (error.code === 'auth/invalid-email') {
+          console.log('Esse email é inválido!');
+        }
+      })
+
+    }else{
+      //Logar User
+      
+      auth().signInWithEmailAndPassword(email, password)
+      .then(() => {
+        navigation.goBack()
+      })
+      .catch((error) => {
+
+        if (error.code === 'auth/invalid-email') {
+          console.log('Esse email é inválido!');
+        }
+
+      })
+    }
+
+  }
 
  return (
     <SafeAreaView style={styles.container}>
@@ -19,6 +70,7 @@ export default function SignIn() {
 
         
         {type && (
+
           <TextInput
           style={styles.input}
           value={name}
@@ -26,12 +78,14 @@ export default function SignIn() {
           placeholder='Qual o seu nome?'
           placeholderTextColor="#99999B"
           />
+
         )}
+
         <TextInput
         style={styles.input}
         value={email}
         onChangeText={(text) => setEmail(text)}
-        placeholder='Sua senha?'
+        placeholder='Seu email'
         placeholderTextColor="#99999B"
         />
 
@@ -41,12 +95,17 @@ export default function SignIn() {
         onChangeText={(text) => setPassword(text)}
         placeholder='Sua senha'
         placeholderTextColor="#99999B"
+        secureTextEntry={true}
         />
 
-        <TouchableOpacity style={[styles.buttonLogin, {backgroundColor: type ? '#f53745' : '#57dd86'}]}>
+        <TouchableOpacity 
+        onPress={handleLogin}
+        style= {[styles.buttonLogin, {backgroundColor: type ? '#f53745' : '#57dd86'}]}>
+
           <Text style={styles.buttonText}>
             {type ? 'Cadastrar' : 'Acessar'}
           </Text>
+
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setType(!type)}>
