@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, SafeAreaView, TouchableOpacity, FlatList, StyleSheet, Modal } from 'react-native';
 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -11,16 +11,28 @@ import ModalNewRoom from '../../components/ModalNewRoom';
 export default function ChatRoom() {
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [user, setUser] = useState(null);
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    //Verificando se o usuário está logado
+    const hasUser = auth().currentUser ? auth().currentUser.toJSON() : null;
+
+    setUser(hasUser);
+
+
+  }, [isFocused])
 
   function handleSignOut(){
 
     auth().signOut()
     .then(() => {
-      navigation.navigate('SignIn')
+      setUser(null);
+      navigation.navigate('SignIn');
     })
     .catch((error) => {
-      console.log(error)
+      console.log(error);
     })
 
   }
@@ -35,8 +47,10 @@ export default function ChatRoom() {
 
               <TouchableOpacity onPress={handleSignOut}>
 
-                <MaterialIcons name="arrow-back" size={28} color="#fff"/>
-
+                {user && (
+                  <MaterialIcons name="arrow-back" size={28} color="#fff"/>
+                )}
+                
               </TouchableOpacity>
 
               <Text style={styles.title}>Grupos</Text>
@@ -49,7 +63,7 @@ export default function ChatRoom() {
 
         </View>
 
-        <FabButton setVisible={ () => setModalVisible(true)}/>
+        <FabButton setVisible={ () => setModalVisible(true)} userStatus={user}/>
 
         <Modal visible={modalVisible} animationType='fade' transparent={true}>
           <ModalNewRoom setVisible={ () => setModalVisible(false)}/>
